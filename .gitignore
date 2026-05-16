@@ -61,4 +61,3 @@ Thumbs.db
 logs/
 
 # Docker
-.dockerignore
