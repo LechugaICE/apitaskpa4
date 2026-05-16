@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskAPI - Gestión de Tareas</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1 { color: #333; text-align: center; margin-bottom: 5px; }
+        p.subtitle { text-align: center; color: #666; margin-bottom: 25px; }
+        .input-group { display: flex; margin-bottom: 20px; }
+        input[type="text"] { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 4px 0 0 4px; font-size: 16px; }
+        button.btn-add { padding: 12px 20px; border: none; background-color: #28a745; color: white; cursor: pointer; border-radius: 0 4px 4px 0; font-weight: bold; }
+        button.btn-add:hover { background-color: #218838; }
+        button.btn-refresh { width: 100%; padding: 10px; border: none; border-radius: 4px; background-color: #17a2b8; color: white; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
+        button.btn-refresh:hover { background-color: #138496; }
+        ul { list-style-type: none; padding: 0; }
+        li { background: #f8f9fa; margin-bottom: 10px; padding: 15px; border-radius: 4px; border-left: 5px solid #007bff; display: flex; justify-content: space-between; align-items: center; }
+        .badge { background: #ffc107; color: #333; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ TaskAPI</h1>
+        <p class="subtitle">Evaluación Sustitutoria - Construcción de Software</p>
+        
+        <div class="input-group">
+            <input type="text" id="nuevaTarea" placeholder="Describe una nueva tarea...">
+            <button class="btn-add" onclick="agregarTarea()">Crear Tarea (POST)</button>
+        </div>
+        
+        <button class="btn-refresh" onclick="cargarTareas()">Actualizar Lista (GET)</button>
+        
+        <ul id="listaTareas">
+            </ul>
+    </div>
+
+    <script>
+        // Función para consultar la API (Consultor GET)
+        async function cargarTareas() {
+            const response = await fetch('/api/tareas');
+            const tareas = await response.json();
+            const lista = document.getElementById('listaTareas');
+            lista.innerHTML = '';
+            
+            tareas.forEach(t => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span><b>ID #${t.id}</b> - ${t.descripcion}</span> <span class="badge">Pendiente</span>`;
+                lista.appendChild(li);
+            });
+        }
+
+        // Función para enviar datos a la API (Insertar POST)
+        async function agregarTarea() {
+            const input = document.getElementById('nuevaTarea');
+            if (!input.value) return alert('Por favor, escribe una tarea.');
+            
+            await fetch('/api/tareas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ descripcion: input.value })
+            });
+            
+            input.value = '';
+            cargarTareas(); // Recargar la lista automáticamente
+        }
+
+        // Cargar los datos al abrir la página
+        cargarTareas();
+    </script>
+</body>
+</html>
